@@ -1,6 +1,6 @@
 import numpy as np
 from .engine.ecs import World
-from .components import Identity, Attributes, Status, Position, Velocity, Alignment, Gender
+from .components import Identity, Attributes, Status, Position, Velocity, Alignment, Gender, Race, Role
 from .systems import movement_system
 
 def create_player(world: World):
@@ -12,8 +12,8 @@ def create_player(world: World):
     
     world.add_component(player, Identity(
         name="Player",
-        role="Valkyrie",
-        race="Human",
+        role=Role.VALKYRIE,
+        race=Race.HUMAN,
         gender=Gender.FEMALE,
         alignment=Alignment.NEUTRAL
     ))
