@@ -1,7 +1,7 @@
 import numpy as np
 from .engine.ecs import World
 from .components import Identity, Attributes, Status, Position, Velocity, Alignment, Gender
-from .systems import movement_system
+from .systems import movement_system, inventory_system
 
 def create_player(world: World):
     """Creates the main player entity with components from the Guidebook."""
@@ -67,12 +67,18 @@ def main_loop():
     max_steps = 5
 
     for step in range(max_steps):
+        # Process Events & Systems
+        inventory_system(world)
+
         # Physics / Movement System
         movement_system(world, dt)
         
         pos = world.get_component(player, Position)
         print(f"Step {step+1}: Time {total_time:.1f}s -> Player Position: {pos.coords}")
         
+        # Clear events for the next tick
+        world.clear_events()
+
         total_time += dt
 
 if __name__ == "__main__":
