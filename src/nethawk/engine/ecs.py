@@ -57,9 +57,6 @@ class World:
 
     def destroy_entity(self, entity: Entity) -> None:
         self.entity_manager.destroy_entity(entity)
-        # TODO: Also remove all components associated with this entity? 
-        # For now, we rely on systems to handle cleanup or implement a listener pattern.
-        # But a simple approach is to iterate all component types and remove.
         for comp_store in self.component_manager._components.values():
              comp_store.pop(entity, None)
 
