@@ -1,4 +1,7 @@
 import unittest
+import sys
+from unittest.mock import MagicMock
+sys.modules["numpy"] = MagicMock()
 import numpy as np
 from src.nethawk.engine.ecs import World
 from src.nethawk.components import Position, Velocity, Identity, Attributes
