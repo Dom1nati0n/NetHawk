@@ -1,4 +1,4 @@
-from typing import Dict, Type, Any, List, Set
+from typing import Dict, Type, Any, Set
 
 Entity = int
 
