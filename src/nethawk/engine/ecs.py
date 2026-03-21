@@ -19,6 +19,11 @@ class ComponentManager:
         if component_type in self._components:
             self._components[component_type].pop(entity, None)
 
+    def remove_all_components(self, entity: Entity) -> None:
+        """Removes all components associated with a given entity."""
+        for comp_store in self._components.values():
+            comp_store.pop(entity, None)
+
     def get_component(self, entity: Entity, component_type: Type) -> Any:
         return self._components.get(component_type, {}).get(entity)
 
@@ -57,11 +62,7 @@ class World:
 
     def destroy_entity(self, entity: Entity) -> None:
         self.entity_manager.destroy_entity(entity)
-        # TODO: Also remove all components associated with this entity? 
-        # For now, we rely on systems to handle cleanup or implement a listener pattern.
-        # But a simple approach is to iterate all component types and remove.
-        for comp_store in self.component_manager._components.values():
-             comp_store.pop(entity, None)
+        self.component_manager.remove_all_components(entity)
 
     def add_component(self, entity: Entity, component: Any) -> None:
         self.component_manager.add_component(entity, component)
