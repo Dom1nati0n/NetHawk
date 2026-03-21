@@ -1,4 +1,5 @@
 from typing import Dict, Type, Any, List, Set
+import sys
 
 Entity = int
 
@@ -35,15 +36,23 @@ class EntityManager:
     def __init__(self):
         self._next_id: Entity = 0
         self._active_entities: Set[Entity] = set()
+        self._free_ids: List[Entity] = []
 
     def create_entity(self) -> Entity:
-        entity = self._next_id
-        self._next_id += 1
+        if self._free_ids:
+            entity = self._free_ids.pop()
+        else:
+            if self._next_id >= sys.maxsize:
+                raise RuntimeError("Maximum number of entities reached")
+            entity = self._next_id
+            self._next_id += 1
         self._active_entities.add(entity)
         return entity
 
     def destroy_entity(self, entity: Entity) -> None:
-        self._active_entities.discard(entity)
+        if entity in self._active_entities:
+            self._active_entities.discard(entity)
+            self._free_ids.append(entity)
 
 class World:
     """The central hub for the ECS."""
