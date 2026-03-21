@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from dataclasses import dataclass, field
 
@@ -24,6 +25,8 @@ class Position:
         return int(self.coords[1])
 
     def set(self, x: float, y: float) -> None:
+        if not math.isfinite(x) or not math.isfinite(y):
+            raise ValueError(f"Position coordinates must be finite, got ({x}, {y})")
         self.coords[0] = x
         self.coords[1] = y
 
