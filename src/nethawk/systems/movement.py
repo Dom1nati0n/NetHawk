@@ -9,7 +9,7 @@ def movement_system(world: World, dt: float):
     velocities = world.get_components(Velocity)
 
     # Intersection of entities having both
-    entities = set(positions.keys()) & set(velocities.keys())
+    entities = positions.keys() & velocities.keys()
 
     for entity in entities:
         pos = positions[entity]
