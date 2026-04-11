@@ -7,12 +7,12 @@ def create_player(world: World):
     """Creates the main player entity with components from the Guidebook."""
     player = world.create_entity()
 
-    # Guidebook: Valkyries are hardy warrior women... strong... stealth and cunning.
     # Guidebook Figure 1: "Player the Rambler St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15 Neutral"
+    # Note: 'Rambler' is the rank 1 title for the Tourist role.
     
     world.add_component(player, Identity(
         name="Player",
-        role="Valkyrie",
+        role="Tourist",
         race="Human",
         gender=Gender.FEMALE,
         alignment=Alignment.NEUTRAL
