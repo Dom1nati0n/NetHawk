@@ -19,6 +19,11 @@ class ComponentManager:
         if component_type in self._components:
             self._components[component_type].pop(entity, None)
 
+    def remove_all_components(self, entity: Entity) -> None:
+        """Removes all components associated with a specific entity."""
+        for comp_store in self._components.values():
+            comp_store.pop(entity, None)
+
     def get_component(self, entity: Entity, component_type: Type) -> Any:
         return self._components.get(component_type, {}).get(entity)
 
