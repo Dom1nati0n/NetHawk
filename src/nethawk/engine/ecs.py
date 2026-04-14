@@ -20,19 +20,23 @@ class ComponentManager:
             self._components[component_type].pop(entity, None)
 
     def remove_all_components(self, entity: Entity) -> None:
-        """Removes all components associated with a given entity."""
+        """Removes all components associated with a specific entity."""
         for comp_store in self._components.values():
             comp_store.pop(entity, None)
 
     def get_component(self, entity: Entity, component_type: Type) -> Any:
-        return self._components.get(component_type, {}).get(entity)
+        if component_type in self._components:
+            return self._components[component_type].get(entity)
+        return None
 
     def has_component(self, entity: Entity, component_type: Type) -> bool:
-        return entity in self._components.get(component_type, {})
+        return component_type in self._components and entity in self._components[component_type]
 
     def get_components(self, component_type: Type) -> Dict[Entity, Any]:
         """Returns all entities and their component of a given type."""
-        return self._components.get(component_type, {})
+        if component_type in self._components:
+            return self._components[component_type]
+        return {}
 
     def remove_all_components(self, entity: Entity) -> None:
         """Removes all components associated with the given entity."""
@@ -61,6 +65,18 @@ class World:
     def __init__(self):
         self.entity_manager = EntityManager()
         self.component_manager = ComponentManager()
+        self._events: List[Any] = []
+
+    def push_event(self, event: Any) -> None:
+        self._events.append(event)
+
+    def get_events(self, event_type: Type = None) -> List[Any]:
+        if event_type is None:
+            return self._events.copy()
+        return [e for e in self._events if isinstance(e, event_type)]
+
+    def clear_events(self) -> None:
+        self._events.clear()
 
     def create_entity(self) -> Entity:
         return self.entity_manager.create_entity()

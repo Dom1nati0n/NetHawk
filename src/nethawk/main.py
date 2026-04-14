@@ -17,8 +17,8 @@ def create_player(world: World):
     """Creates the main player entity with components from the Guidebook."""
     player = world.create_entity()
 
-    # Guidebook: Valkyries are hardy warrior women... strong... stealth and cunning.
     # Guidebook Figure 1: "Player the Rambler St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15 Neutral"
+    # Note: 'Rambler' is the rank 1 title for the Tourist role.
     
     world.add_component(player, Identity(
         name="Player",
@@ -81,12 +81,18 @@ def run_simulation():
     max_steps = 5
 
     for step in range(max_steps):
+        # Process Events & Systems
+        inventory_system(world)
+
         # Physics / Movement System
         movement_system(world, dt)
         
         pos = world.get_component(player, Position)
         print(f"Step {step+1}: Time {total_time:.1f}s -> Player Position: {pos.coords}")
         
+        # Clear events for the next tick
+        world.clear_events()
+
         total_time += dt
 
 async def run_server(host, port):
