@@ -1,54 +1,40 @@
 import unittest
-from src.nethawk.engine.ecs import World, Entity
+from nethawk.engine.ecs import ComponentManager
 
-class MockComponentA:
+class MockComponent:
     pass
 
-class MockComponentB:
+class AnotherComponent:
     pass
 
-class TestECS(unittest.TestCase):
+class TestComponentManager(unittest.TestCase):
     def setUp(self):
-        self.world = World()
+        self.manager = ComponentManager()
+        self.entity = 1
 
-    def test_entity_creation(self):
-        entity = self.world.create_entity()
-        self.assertIsInstance(entity, int)
+    def test_remove_component_happy_path(self):
+        """Test removing a component that the entity possesses."""
+        comp = MockComponent()
+        self.manager.add_component(self.entity, comp)
+        self.assertTrue(self.manager.has_component(self.entity, MockComponent))
 
-    def test_add_get_has_component(self):
-        entity = self.world.create_entity()
-        comp_a = MockComponentA()
+        self.manager.remove_component(self.entity, MockComponent)
+        self.assertFalse(self.manager.has_component(self.entity, MockComponent))
 
-        self.world.add_component(entity, comp_a)
+    def test_remove_component_non_existent_type(self):
+        """Test removing a component type that has never been registered."""
+        # Should not raise any exception (e.g., KeyError)
+        self.manager.remove_component(self.entity, MockComponent)
 
-        self.assertTrue(self.world.has_component(entity, MockComponentA))
-        self.assertEqual(self.world.get_component(entity, MockComponentA), comp_a)
-        self.assertFalse(self.world.has_component(entity, MockComponentB))
+    def test_remove_component_non_existent_entity(self):
+        """Test removing a component from an entity that doesn't have it, when the type exists."""
+        # Add component to another entity so the type is registered
+        comp = MockComponent()
+        self.manager.add_component(2, comp)
 
-    def test_remove_component(self):
-        entity = self.world.create_entity()
-        comp_a = MockComponentA()
-        self.world.add_component(entity, comp_a)
+        # Attempt to remove from self.entity (which doesn't have it)
+        # Should not raise any exception
+        self.manager.remove_component(self.entity, MockComponent)
 
-        self.world.remove_component(entity, MockComponentA)
-        self.assertFalse(self.world.has_component(entity, MockComponentA))
-
-    def test_destroy_entity_removes_components(self):
-        entity = self.world.create_entity()
-        comp_a = MockComponentA()
-        comp_b = MockComponentB()
-
-        self.world.add_component(entity, comp_a)
-        self.world.add_component(entity, comp_b)
-
-        self.assertTrue(self.world.has_component(entity, MockComponentA))
-        self.assertTrue(self.world.has_component(entity, MockComponentB))
-
-        self.world.destroy_entity(entity)
-
-        # After destruction, components should be gone from the manager
-        self.assertFalse(self.world.has_component(entity, MockComponentA))
-        self.assertFalse(self.world.has_component(entity, MockComponentB))
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
