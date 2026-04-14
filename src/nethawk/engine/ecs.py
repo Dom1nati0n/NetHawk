@@ -25,14 +25,18 @@ class ComponentManager:
             comp_store.pop(entity, None)
 
     def get_component(self, entity: Entity, component_type: Type) -> Any:
-        return self._components.get(component_type, {}).get(entity)
+        if component_type in self._components:
+            return self._components[component_type].get(entity)
+        return None
 
     def has_component(self, entity: Entity, component_type: Type) -> bool:
-        return entity in self._components.get(component_type, {})
+        return component_type in self._components and entity in self._components[component_type]
 
     def get_components(self, component_type: Type) -> Dict[Entity, Any]:
         """Returns all entities and their component of a given type."""
-        return self._components.get(component_type, {})
+        if component_type in self._components:
+            return self._components[component_type]
+        return {}
 
     def remove_all_components(self, entity: Entity) -> None:
         """Removes all components associated with the given entity."""
