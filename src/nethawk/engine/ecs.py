@@ -83,7 +83,8 @@ class World:
 
     def destroy_entity(self, entity: Entity) -> None:
         self.entity_manager.destroy_entity(entity)
-        self.component_manager.remove_all_components(entity)
+        for comp_store in self.component_manager._components.values():
+             comp_store.pop(entity, None)
 
     def add_component(self, entity: Entity, component: Any) -> None:
         self.component_manager.add_component(entity, component)
