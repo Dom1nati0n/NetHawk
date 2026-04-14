@@ -81,12 +81,18 @@ def run_simulation():
     max_steps = 5
 
     for step in range(max_steps):
+        # Process Events & Systems
+        inventory_system(world)
+
         # Physics / Movement System
         movement_system(world, dt)
         
         pos = world.get_component(player, Position)
         print(f"Step {step+1}: Time {total_time:.1f}s -> Player Position: {pos.coords}")
         
+        # Clear events for the next tick
+        world.clear_events()
+
         total_time += dt
 
 async def run_server(host, port):
