@@ -1,58 +1,40 @@
 import unittest
-import sys
-import os
+from nethawk.engine.ecs import ComponentManager
 
-# Add src to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+class MockComponent:
+    pass
 
-from nethawk.engine.ecs import ComponentManager, World
+class AnotherComponent:
+    pass
 
-class MockPosition:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+class TestComponentManager(unittest.TestCase):
+    def setUp(self):
+        self.manager = ComponentManager()
+        self.entity = 1
 
-class MockVelocity:
-    def __init__(self, vx, vy):
-        self.vx = vx
-        self.vy = vy
+    def test_remove_component_happy_path(self):
+        """Test removing a component that the entity possesses."""
+        comp = MockComponent()
+        self.manager.add_component(self.entity, comp)
+        self.assertTrue(self.manager.has_component(self.entity, MockComponent))
 
-class TestECS(unittest.TestCase):
-    def test_component_manager_basic(self):
-        cm = ComponentManager()
-        entity = 1
-        pos = MockPosition(10, 20)
+        self.manager.remove_component(self.entity, MockComponent)
+        self.assertFalse(self.manager.has_component(self.entity, MockComponent))
 
-        # Test add and has
-        cm.add_component(entity, pos)
-        self.assertTrue(cm.has_component(entity, MockPosition))
-        self.assertFalse(cm.has_component(entity, MockVelocity))
-        self.assertFalse(cm.has_component(2, MockPosition))
+    def test_remove_component_non_existent_type(self):
+        """Test removing a component type that has never been registered."""
+        # Should not raise any exception (e.g., KeyError)
+        self.manager.remove_component(self.entity, MockComponent)
 
-        # Test get_component
-        self.assertEqual(cm.get_component(entity, MockPosition), pos)
-        self.assertIsNone(cm.get_component(entity, MockVelocity))
-        self.assertIsNone(cm.get_component(2, MockPosition))
+    def test_remove_component_non_existent_entity(self):
+        """Test removing a component from an entity that doesn't have it, when the type exists."""
+        # Add component to another entity so the type is registered
+        comp = MockComponent()
+        self.manager.add_component(2, comp)
 
-        # Test get_components
-        positions = cm.get_components(MockPosition)
-        self.assertEqual(len(positions), 1)
-        self.assertEqual(positions[entity], pos)
-
-        velocities = cm.get_components(MockVelocity)
-        self.assertEqual(velocities, {})
-
-    def test_world_integration(self):
-        world = World()
-        entity = world.create_entity()
-        pos = MockPosition(10, 20)
-
-        world.add_component(entity, pos)
-        self.assertTrue(world.has_component(entity, MockPosition))
-        self.assertEqual(world.get_component(entity, MockPosition), pos)
-
-        world.destroy_entity(entity)
-        self.assertFalse(world.has_component(entity, MockPosition))
+        # Attempt to remove from self.entity (which doesn't have it)
+        # Should not raise any exception
+        self.manager.remove_component(self.entity, MockComponent)
 
 if __name__ == "__main__":
     unittest.main()

@@ -11,10 +11,32 @@ class Gender(Enum):
     FEMALE = auto()
     NEUTER = auto() # For monsters
 
+class Race(Enum):
+    HUMAN = auto()
+    ELF = auto()
+    DWARF = auto()
+    GNOME = auto()
+    ORC = auto()
+
+class Role(Enum):
+    ARCHEOLOGIST = auto()
+    BARBARIAN = auto()
+    CAVEMAN = auto()
+    HEALER = auto()
+    KNIGHT = auto()
+    MONK = auto()
+    PRIEST = auto()
+    RANGER = auto()
+    ROGUE = auto()
+    SAMURAI = auto()
+    TOURIST = auto()
+    VALKYRIE = auto()
+    WIZARD = auto()
+
 @dataclass
 class Identity:
     name: str
-    role: str
-    race: str
+    role: Role
+    race: Race
     gender: Gender
     alignment: Alignment
