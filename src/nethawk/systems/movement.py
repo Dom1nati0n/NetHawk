@@ -9,15 +9,18 @@ def movement_system(world: World, dt: float):
     velocities = world.get_components(Velocity)
 
     # Intersection of entities having both
-    entities = positions.keys() & velocities.keys()
-
-    for entity in entities:
-        pos = positions[entity]
-        vel = velocities[entity]
-
-        # Update position
-        # We now use floats to accumulate sub-grid movement
-        # pos.coords is float32, vel.vector is float32
-        
-        # Simple Euler integration: p' = p + v * dt
-        pos.coords += vel.vector * dt
+    # Optimization: iterate over the smaller dict to avoid extra set allocations
+    if len(positions) < len(velocities):
+        for entity, pos in positions.items():
+            if entity in velocities:
+                vel = velocities[entity]
+                # Update position
+                # Simple Euler integration: p' = p + v * dt
+                pos.coords += vel.vector * dt
+    else:
+        for entity, vel in velocities.items():
+            if entity in positions:
+                pos = positions[entity]
+                # Update position
+                # Simple Euler integration: p' = p + v * dt
+                pos.coords += vel.vector * dt
