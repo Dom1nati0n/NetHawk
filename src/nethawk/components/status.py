@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from typing import Set
 
 @dataclass
@@ -15,13 +15,19 @@ class Status:
     conditions: Set[str] = field(default_factory=set) # e.g. "blind", "confused"
 
     def __post_init__(self):
-        if self.max_hp < 1:
-            raise ValueError(f"max_hp must be >= 1, got {self.max_hp}")
-        if self.max_power < 0:
-            raise ValueError(f"max_power must be >= 0, got {self.max_power}")
-        if self.level < 1:
-            raise ValueError(f"level must be >= 1, got {self.level}")
-        if self.gold < 0:
-            raise ValueError(f"gold cannot be negative, got {self.gold}")
-        if self.exp < 0:
-            raise ValueError(f"exp cannot be negative, got {self.exp}")
+        for f in fields(self):
+            value = getattr(self, f.name)
+
+            # Type validation based on dataclass field type
+            if f.type == int:
+                if not isinstance(value, int) or isinstance(value, bool):
+                    raise TypeError(f"Field '{f.name}' must be of type int, got {type(value).__name__}")
+
+            # Range validation: most status fields should be non-negative
+            if f.name in ["hp", "max_hp", "power", "max_power", "level", "gold", "exp", "hunger"]:
+                if value < 0:
+                    raise ValueError(f"Field '{f.name}' must be non-negative, got {value}")
+
+            # Specific logic: level must be at least 1
+            if f.name == "level" and value == 0:
+                raise ValueError("Field 'level' must be at least 1")
