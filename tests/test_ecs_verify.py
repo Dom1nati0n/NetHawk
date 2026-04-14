@@ -1,29 +1,59 @@
 import unittest
-import sys
+from nethawk.engine.ecs import World
 
-from src.nethawk.engine.ecs import World, EntityManager
+class Position:
+    def __init__(self, x: int, y: int):
+        self.x = x
+        self.y = y
+
+class Velocity:
+    def __init__(self, dx: int, dy: int):
+        self.dx = dx
+        self.dy = dy
 
 class TestECS(unittest.TestCase):
-    def test_entity_manager_recycle(self):
-        manager = EntityManager()
-        id1 = manager.create_entity()
-        id2 = manager.create_entity()
-        self.assertEqual(id1, 0)
-        self.assertEqual(id2, 1)
+    def test_entity_creation(self):
+        world = World()
+        e1 = world.create_entity()
+        e2 = world.create_entity()
+        self.assertNotEqual(e1, e2)
 
-        manager.destroy_entity(id1)
+    def test_component_addition_retrieval(self):
+        world = World()
+        e = world.create_entity()
+        pos = Position(10, 20)
+        world.add_component(e, pos)
 
-        # Next created entity should reuse id1
-        id3 = manager.create_entity()
-        self.assertEqual(id3, id1)
+        retrieved_pos = world.get_component(e, Position)
+        self.assertEqual(retrieved_pos.x, 10)
+        self.assertEqual(retrieved_pos.y, 20)
 
-    def test_entity_manager_maxsize(self):
-        manager = EntityManager()
-        # Mock next_id to be maxsize
-        manager._next_id = sys.maxsize
+    def test_has_component(self):
+        world = World()
+        e = world.create_entity()
+        world.add_component(e, Position(0, 0))
+        self.assertTrue(world.has_component(e, Position))
+        self.assertFalse(world.has_component(e, Velocity))
 
-        with self.assertRaises(RuntimeError):
-            manager.create_entity()
+    def test_entity_destruction_cleanup(self):
+        world = World()
+        e = world.create_entity()
+        world.add_component(e, Position(1, 1))
+
+        world.destroy_entity(e)
+        self.assertIsNone(world.get_component(e, Position))
+
+    def test_get_components_bulk(self):
+        world = World()
+        e1 = world.create_entity()
+        e2 = world.create_entity()
+        world.add_component(e1, Position(1, 1))
+        world.add_component(e2, Position(2, 2))
+
+        positions = world.get_components(Position)
+        self.assertEqual(len(positions), 2)
+        self.assertIn(e1, positions)
+        self.assertIn(e2, positions)
 
 if __name__ == '__main__':
     unittest.main()
